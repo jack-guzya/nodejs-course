@@ -1,9 +1,22 @@
+const User = require('./user.model');
 const usersRepo = require('./user.memory.repository');
 
-const getAll = () => usersRepo.getAll();
+const getAll = async () => {
+  const users = await usersRepo.getAll();
 
-const get = id => usersRepo.get(id);
+  return users.map(User.toResponse);
+};
 
-const create = userParams => usersRepo.create(userParams);
+const get = async id => {
+  const user = await usersRepo.get(id);
+
+  return User.toResponse(user);
+};
+
+const create = async userParams => {
+  const user = await usersRepo.create(new User(userParams));
+
+  return User.toResponse(user);
+};
 
 module.exports = { getAll, get, create };
