@@ -19,4 +19,16 @@ const create = async userParams => {
   return User.toResponse(user);
 };
 
-module.exports = { getAll, get, create };
+const update = async (id, { name, login, password }) => {
+  const user = await usersRepo.update(id, { name, login, password });
+
+  return User.toResponse(user);
+};
+
+const deleteUser = async id => {
+  const user = await usersRepo.delete(id);
+
+  return User.toResponse(user);
+};
+
+module.exports = { getAll, get, create, update, delete: deleteUser };

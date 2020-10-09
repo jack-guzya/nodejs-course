@@ -12,10 +12,45 @@ const DB = {
   [TABLES.TASKS]: []
 };
 
-const getAll = table => [...DB[table]];
+const getEntryIndex = (table, id) =>
+  DB[table].findIndex(entry => entry.id === id);
 
-const get = table => id => DB[table].find(entity => entity.id === id);
+const getAll = async table => [...DB[table]];
 
-const create = table => async entity => DB[table].push(entity);
+const get = table => async id => {
+  const entity = DB[table].find(item => item.id === id);
 
-module.exports = { TABLES, getAll, get, create };
+  return entity ? { ...entity } : null;
+};
+
+const create = table => async entity => {
+  DB[table].push(entity);
+
+  return entity;
+};
+
+const update = table => async (id, params) => {
+  const index = getEntryIndex(table, id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  DB[table][index] = { id, ...params };
+
+  return DB[table][index] || null;
+};
+
+const deleteEntry = table => async id => {
+  const index = getEntryIndex(table, id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const [entry] = DB[table].splice(index, 1);
+
+  return entry;
+};
+
+module.exports = { TABLES, getAll, get, create, update, delete: deleteEntry };
