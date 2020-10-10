@@ -35,7 +35,7 @@ const update = table => async (id, params) => {
   if (index === -1) {
     return null;
   }
-
+  console.log(params);
   DB[table][index] = { id, ...params };
 
   return DB[table][index] || null;
