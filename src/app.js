@@ -4,6 +4,7 @@ const path = require('path');
 const YAML = require('yamljs');
 // Routers
 const userRouter = require('./resources/users/user.router');
+const boardRouter = require('./resources/boards/board.router');
 // Helpers
 const handleError = require('./helpers/errors').handleMiddlewareError;
 
@@ -23,6 +24,8 @@ app.use('/', (req, res, next) => {
 });
 
 app.use('/users', userRouter);
+
+app.use('/boards', boardRouter);
 
 app.use(handleError);
 
