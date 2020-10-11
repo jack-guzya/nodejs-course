@@ -1,15 +1,17 @@
 const DB = require('../../common/db');
 const { RestError } = require('../../helpers/errors');
 
-const getAll = async boardId => {
-  const all = await DB.getAll(DB.TABLES.TASKS);
-  const tasks = all.filter(task => task.boardId === boardId);
+const getAll = async () => DB.getAll(DB.TABLES.TASKS);
+const find = DB.find(DB.TABLES.TASKS);
+
+const getByBoardId = async boardId => {
+  const tasks = await find(task => task.boardId === boardId);
 
   return tasks;
 };
 
 const get = async ({ taskId, boardId }) => {
-  const [task] = await DB.find(DB.TABLES.TASKS)(
+  const [task] = await find(
     item => item.id === taskId && item.boardId === boardId
   );
 
@@ -20,9 +22,8 @@ const get = async ({ taskId, boardId }) => {
   return task;
 };
 
-const update = async ({ taskId, boardId }, params) => {
-  const task = await get({ taskId, boardId });
-  const updatedTask = await DB.update(DB.TABLES.TASKS)(task.id, params);
+const update = async (taskId, params) => {
+  const updatedTask = await DB.update(DB.TABLES.TASKS)(taskId, params);
 
   if (!updatedTask) {
     throw new RestError(
@@ -34,9 +35,8 @@ const update = async ({ taskId, boardId }, params) => {
   return updatedTask;
 };
 
-const deleteTask = async ({ taskId, boardId }) => {
-  const task = await get({ taskId, boardId });
-  const deleted = await DB.delete(DB.TABLES.TASKS)(task.id);
+const deleteTask = async taskId => {
+  const deleted = await DB.delete(DB.TABLES.TASKS)(taskId);
 
   if (!deleted) {
     throw new RestError(
@@ -49,21 +49,10 @@ const deleteTask = async ({ taskId, boardId }) => {
 };
 
 const deleteAll = async boardId => {
-  const tasks = await getAll(boardId);
+  const tasks = await getByBoardId(boardId);
+
   tasks.length &&
     tasks.forEach(async task => await DB.delete(DB.TABLES.TASKS)(task.id));
-
-  return tasks;
-};
-
-const deleteUserInTasks = async userId => {
-  const all = await DB.getAll(DB.TABLES.TASKS);
-  const tasks = all.filter(task => task.userId === userId);
-
-  tasks.length &&
-    tasks.forEach(
-      async task => await DB.update(DB.TABLES.TASKS)(task.id, { userId: null })
-    );
 
   return tasks;
 };
@@ -76,10 +65,11 @@ const create = async entity => {
 
 module.exports = {
   getAll,
+  getByBoardId,
   get,
   create,
   update,
   delete: deleteTask,
   deleteAll,
-  deleteUserInTasks
+  find
 };
