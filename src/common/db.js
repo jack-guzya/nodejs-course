@@ -35,7 +35,7 @@ const update = table => async (id, params) => {
   if (index === -1) {
     return null;
   }
-  console.log(params);
+
   DB[table][index] = { id, ...params };
 
   return DB[table][index] || null;
@@ -53,4 +53,14 @@ const deleteEntry = table => async id => {
   return entry;
 };
 
-module.exports = { TABLES, getAll, get, create, update, delete: deleteEntry };
+const find = table => async callback => DB[table].filter(callback);
+
+module.exports = {
+  TABLES,
+  getAll,
+  get,
+  create,
+  update,
+  delete: deleteEntry,
+  find
+};
