@@ -1,6 +1,8 @@
 const router = require('express').Router();
-const usersService = require('./user.service');
 const { asyncHandleError } = require('../../helpers/errors');
+// Services
+const usersService = require('./user.service');
+const taskService = require('../tasks/task.service');
 
 router.route('/').get(async (req, res) => {
   const users = await usersService.getAll();
@@ -30,8 +32,10 @@ router.route('/:id').put(
 
 router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
-    const user = await usersService.delete(req.params.id);
-    res.json(user);
+    await usersService.delete(req.params.id);
+    await taskService.deleteUserInTasks(req.params.id);
+
+    res.status(204).json({ message: 'The user has been deleted' });
   })
 );
 

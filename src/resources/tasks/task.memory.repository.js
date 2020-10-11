@@ -5,10 +5,6 @@ const getAll = async boardId => {
   const all = await DB.getAll(DB.TABLES.TASKS);
   const tasks = all.filter(task => task.boardId === boardId);
 
-  if (!tasks.length) {
-    throw new RestError(404, `Cannot get tasks by board id: ${boardId}`);
-  }
-
   return tasks;
 };
 
@@ -52,10 +48,38 @@ const deleteTask = async ({ taskId, boardId }) => {
   return deleted;
 };
 
+const deleteAll = async boardId => {
+  const tasks = await getAll(boardId);
+  tasks.length &&
+    tasks.forEach(async task => await DB.delete(DB.TABLES.TASKS)(task.id));
+
+  return tasks;
+};
+
+const deleteUserInTasks = async userId => {
+  const all = await DB.getAll(DB.TABLES.TASKS);
+  const tasks = all.filter(task => task.userId === userId);
+
+  tasks.length &&
+    tasks.forEach(
+      async task => await DB.update(DB.TABLES.TASKS)(task.id, { userId: null })
+    );
+
+  return tasks;
+};
+
 const create = async entity => {
   const task = await DB.create(DB.TABLES.TASKS)(entity);
 
   return task;
 };
 
-module.exports = { getAll, get, create, update, delete: deleteTask };
+module.exports = {
+  getAll,
+  get,
+  create,
+  update,
+  delete: deleteTask,
+  deleteAll,
+  deleteUserInTasks
+};

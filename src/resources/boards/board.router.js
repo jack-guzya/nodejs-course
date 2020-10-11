@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const { asyncHandleError } = require('../../helpers/errors');
+// Services
 const boardService = require('./board.service');
+const taskService = require('../tasks/task.service');
 
 router.route('/').get(
   asyncHandleError(async (req, res) => {
@@ -32,8 +34,10 @@ router.route('/:boardId').put(
 
 router.route('/:boardId').delete(
   asyncHandleError(async (req, res) => {
-    const board = await boardService.delete(req.params.boardId);
-    res.json(board);
+    await boardService.delete(req.params.boardId);
+    await taskService.deleteAll(req.params.boardId);
+
+    res.status(204).json({ message: 'The board has been deleted' });
   })
 );
 
