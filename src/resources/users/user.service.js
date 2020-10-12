@@ -1,4 +1,5 @@
 const User = require('./user.model');
+const userValidation = require('./user.validation');
 const usersRepo = require('./user.memory.repository');
 
 const getAll = async () => {
@@ -13,13 +14,17 @@ const get = async id => {
   return User.toResponse(user);
 };
 
-const create = async userParams => {
-  const user = await usersRepo.create(new User(userParams));
+const create = async ({ name, login, password }) => {
+  userValidation.isData(name, login, password);
+
+  const user = await usersRepo.create(new User({ name, login, password }));
 
   return User.toResponse(user);
 };
 
 const update = async (id, { name, login, password }) => {
+  userValidation.isData(name, login, password);
+
   const user = await usersRepo.update(id, { name, login, password });
 
   return User.toResponse(user);

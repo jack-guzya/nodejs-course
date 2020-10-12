@@ -38,7 +38,7 @@ const deleteUser = async id => {
   if (!user) {
     throw new RestError(
       404,
-      `Cannot delete the user by id: ${id}. This user is not exist.`
+      `Cannot delete the user by id: ${id}. User not found.`
     );
   }
 
