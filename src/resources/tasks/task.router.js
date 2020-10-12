@@ -19,21 +19,21 @@ router.route('/').post(
   })
 );
 
-router.route('/:taskId').get(
+router.route('/:id').get(
   asyncHandleError(async (req, res) => {
     const task = await taskService.get({
-      taskId: req.params.taskId,
+      id: req.params.id,
       boardId: req.params.boardId
     });
     res.json(task);
   })
 );
 
-router.route('/:taskId').put(
+router.route('/:id').put(
   asyncHandleError(async (req, res) => {
     const task = await taskService.update(
       {
-        taskId: req.params.taskId,
+        id: req.params.id,
         boardId: req.params.boardId
       },
       req.body
@@ -42,10 +42,10 @@ router.route('/:taskId').put(
   })
 );
 
-router.route('/:taskId').delete(
+router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
     await taskService.delete({
-      taskId: req.params.taskId,
+      id: req.params.id,
       boardId: req.params.boardId
     });
     res.status(204).json({ message: 'The task has been deleted' });

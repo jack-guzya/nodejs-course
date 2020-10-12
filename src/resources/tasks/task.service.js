@@ -13,21 +13,21 @@ const create = async params => {
   return task;
 };
 
-const get = async ({ taskId, boardId }) => {
-  const task = await taskRepo.get({ taskId, boardId });
+const get = async ({ id, boardId }) => {
+  const task = await taskRepo.get({ id, boardId });
 
   return task;
 };
 
-const update = async ({ taskId, boardId }, params) => {
-  const task = await taskRepo.get({ taskId, boardId });
+const update = async ({ id, boardId }, params) => {
+  const task = await taskRepo.get({ id, boardId });
   const board = await taskRepo.update(task.id, params);
 
   return board;
 };
 
-const deleteTask = async ({ taskId, boardId }) => {
-  const task = await taskRepo.get({ taskId, boardId });
+const deleteTask = async ({ id, boardId }) => {
+  const task = await taskRepo.get({ id, boardId });
   const deletedTask = await taskRepo.delete(task.id);
 
   return deletedTask;
