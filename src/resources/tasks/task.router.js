@@ -12,7 +12,11 @@ router.route('/').get(
 router.route('/').post(
   asyncHandleError(async (req, res) => {
     const task = await taskService.create({
-      ...req.body,
+      title: req.body.title,
+      order: req.body.order,
+      description: req.body.description,
+      userId: req.body.userId,
+      columnId: req.body.columnId,
       boardId: req.body.boardId || req.params.boardId
     });
     res.json(task);
@@ -36,7 +40,14 @@ router.route('/:id').put(
         id: req.params.id,
         boardId: req.params.boardId
       },
-      req.body
+      {
+        title: req.body.title,
+        order: req.body.order,
+        description: req.body.description,
+        userId: req.body.userId,
+        columnId: req.body.columnId,
+        boardId: req.body.boardId || req.params.boardId
+      }
     );
     res.json(task);
   })

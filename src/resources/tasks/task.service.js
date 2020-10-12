@@ -1,5 +1,6 @@
-const taskRepo = require('./task.memory.repository');
 const { Task } = require('./task.model');
+const taskValidation = require('./task.validation');
+const taskRepo = require('./task.memory.repository');
 
 const getAll = async boardId => {
   const tasks = await taskRepo.getByBoardId(boardId);
@@ -7,8 +8,10 @@ const getAll = async boardId => {
   return tasks;
 };
 
-const create = async params => {
-  const task = await taskRepo.create(new Task(params));
+const create = async data => {
+  taskValidation.isData(data);
+
+  const task = await taskRepo.create(new Task(data));
 
   return task;
 };
@@ -19,9 +22,11 @@ const get = async ({ id, boardId }) => {
   return task;
 };
 
-const update = async ({ id, boardId }, params) => {
+const update = async ({ id, boardId }, data) => {
+  taskValidation.isData(data);
+
   const task = await taskRepo.get({ id, boardId });
-  const board = await taskRepo.update(task.id, params);
+  const board = await taskRepo.update(task.id, data);
 
   return board;
 };

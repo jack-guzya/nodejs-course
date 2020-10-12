@@ -14,7 +14,7 @@ const get = async ({ id, boardId }) => {
   const [task] = await find(item => item.id === id && item.boardId === boardId);
 
   if (!task) {
-    throw new RestError(404, `Cannot get the task by id: ${id}`);
+    throw new RestError(404, `Task not found: ${id}`);
   }
 
   return task;
@@ -23,25 +23,11 @@ const get = async ({ id, boardId }) => {
 const update = async (id, params) => {
   const updatedTask = await DB.update(DB.TABLES.TASKS)(id, params);
 
-  if (!updatedTask) {
-    throw new RestError(
-      404,
-      `Cannot update the task by id: ${id}. This task is not exist.`
-    );
-  }
-
   return updatedTask;
 };
 
 const deleteTask = async id => {
   const deleted = await DB.delete(DB.TABLES.TASKS)(id);
-
-  if (!deleted) {
-    throw new RestError(
-      404,
-      `Cannot delete the task by id: ${id}. This task is not exist.`
-    );
-  }
 
   return deleted;
 };
