@@ -9,6 +9,17 @@ router.route('/').get(async (req, res) => {
   res.json(users);
 });
 
+router.route('/').post(
+  asyncHandleError(async (req, res) => {
+    const user = await usersService.create({
+      name: req.body.name,
+      login: req.body.login,
+      password: req.body.password
+    });
+    res.json(user);
+  })
+);
+
 router.route('/:id').get(
   asyncHandleError(async (req, res) => {
     const user = await usersService.get(req.params.id);
@@ -16,16 +27,13 @@ router.route('/:id').get(
   })
 );
 
-router.route('/').post(
-  asyncHandleError(async (req, res) => {
-    const user = await usersService.create(req.body);
-    res.json(user);
-  })
-);
-
 router.route('/:id').put(
   asyncHandleError(async (req, res) => {
-    const user = await usersService.update(req.params.id, req.body);
+    const user = await usersService.update(req.params.id, {
+      name: req.body.name,
+      login: req.body.login,
+      password: req.body.password
+    });
     res.json(user);
   })
 );
@@ -35,7 +43,7 @@ router.route('/:id').delete(
     await usersService.delete(req.params.id);
     await taskService.deleteUserInTasks(req.params.id);
 
-    res.status(204).json({ message: 'The user has been deleted' });
+    res.sendStatus(204);
   })
 );
 

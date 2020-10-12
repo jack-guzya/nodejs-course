@@ -14,23 +14,25 @@ const get = async id => {
   return User.toResponse(user);
 };
 
-const create = async ({ name, login, password }) => {
-  userValidation.isData(name, login, password);
+const create = async data => {
+  userValidation.isData(data);
 
-  const user = await usersRepo.create(new User({ name, login, password }));
+  const user = await usersRepo.create(new User(data));
 
   return User.toResponse(user);
 };
 
-const update = async (id, { name, login, password }) => {
-  userValidation.isData(name, login, password);
+const update = async (id, data) => {
+  userValidation.isData(data);
 
-  const user = await usersRepo.update(id, { name, login, password });
+  await usersRepo.get(id);
+  const user = await usersRepo.update(id, data);
 
   return User.toResponse(user);
 };
 
 const deleteUser = async id => {
+  await usersRepo.get(id);
   const user = await usersRepo.delete(id);
 
   return User.toResponse(user);

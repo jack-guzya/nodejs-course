@@ -1,7 +1,6 @@
 const TABLES = {
   USERS: 'users',
   BOARDS: 'boards',
-  COLUMNS: 'columns',
   TASKS: 'tasks'
 };
 
@@ -37,7 +36,7 @@ const update = table => async (id, params) => {
 
   DB[table][index] = { ...DB[table][index], ...params };
 
-  return DB[table][index] || null;
+  return { ...DB[table][index] } || null;
 };
 
 const deleteEntry = table => async id => {

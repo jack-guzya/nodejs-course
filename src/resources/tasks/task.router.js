@@ -59,7 +59,7 @@ router.route('/:id').delete(
       id: req.params.id,
       boardId: req.params.boardId
     });
-    res.status(204).json({ message: 'The task has been deleted' });
+    res.sendStatus(204);
   })
 );
 

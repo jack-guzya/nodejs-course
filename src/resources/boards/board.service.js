@@ -8,10 +8,10 @@ const getAll = async () => {
   return board;
 };
 
-const create = async ({ title, columns = [] }) => {
-  boardValidation.isData(title, columns);
+const create = async data => {
+  boardValidation.isData(data);
 
-  const board = await boardRepo.create(new Board({ title, columns }));
+  const board = await boardRepo.create(new Board(data));
 
   return board;
 };
@@ -22,15 +22,17 @@ const get = async id => {
   return board;
 };
 
-const update = async (id, { title, columns }) => {
-  boardValidation.isData(title, columns);
+const update = async (id, data) => {
+  boardValidation.isData(data);
 
-  const board = await boardRepo.update(id, { title, columns });
+  await boardRepo.get(id);
+  const board = await boardRepo.update(id, data);
 
   return board;
 };
 
 const deleteBoard = async id => {
+  await boardRepo.get(id);
   const board = await boardRepo.delete(id);
 
   return board;

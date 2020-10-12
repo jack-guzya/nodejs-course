@@ -13,7 +13,10 @@ router.route('/').get(
 
 router.route('/').post(
   asyncHandleError(async (req, res) => {
-    const board = await boardService.create(req.body);
+    const board = await boardService.create({
+      title: req.body.title,
+      columns: req.body.columns
+    });
     res.json(board);
   })
 );
@@ -27,7 +30,10 @@ router.route('/:id').get(
 
 router.route('/:id').put(
   asyncHandleError(async (req, res) => {
-    const board = await boardService.update(req.params.id, req.body);
+    const board = await boardService.update(req.params.id, {
+      title: req.body.title,
+      columns: req.body.columns
+    });
     res.json(board);
   })
 );
@@ -37,7 +43,7 @@ router.route('/:id').delete(
     await boardService.delete(req.params.id);
     await taskService.deleteAll(req.params.id);
 
-    res.status(204).json({ message: 'The board has been deleted' });
+    res.sendStatus(204);
   })
 );
 
