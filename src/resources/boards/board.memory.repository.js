@@ -7,7 +7,10 @@ const get = async id => {
   const board = await DB.get(DB.TABLES.BOARDS)(id);
 
   if (!board) {
-    throw new RestError(404, `Cannot get the board by id: ${id}`);
+    throw new RestError(
+      404,
+      `Cannot get the board by id: ${id}. Board not found`
+    );
   }
 
   return board;
@@ -19,7 +22,7 @@ const update = async (id, params) => {
   if (!board) {
     throw new RestError(
       404,
-      `Cannot update the board by id: ${id}. This board is not exist.`
+      `Cannot update the board by id: ${id}. Board not found`
     );
   }
 
@@ -32,7 +35,7 @@ const deleteBoard = async id => {
   if (!board) {
     throw new RestError(
       404,
-      `Cannot delete the board by id: ${id}. This board is not exist.`
+      `Cannot delete the board by id: ${id}. Board not found`
     );
   }
 

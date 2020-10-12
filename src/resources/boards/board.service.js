@@ -1,5 +1,6 @@
-const boardRepo = require('./board.memory.repository');
 const { Board } = require('./board.model');
+const boardValidation = require('./board.validation');
+const boardRepo = require('./board.memory.repository');
 
 const getAll = async () => {
   const board = await boardRepo.getAll();
@@ -7,8 +8,10 @@ const getAll = async () => {
   return board;
 };
 
-const create = async params => {
-  const board = await boardRepo.create(new Board(params));
+const create = async ({ title, columns = [] }) => {
+  boardValidation.isData(title, columns);
+
+  const board = await boardRepo.create(new Board({ title, columns }));
 
   return board;
 };
@@ -19,8 +22,10 @@ const get = async id => {
   return board;
 };
 
-const update = async (id, params) => {
-  const board = await boardRepo.update(id, params);
+const update = async (id, { title, columns }) => {
+  boardValidation.isData(title, columns);
+
+  const board = await boardRepo.update(id, { title, columns });
 
   return board;
 };

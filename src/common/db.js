@@ -8,7 +8,6 @@ const TABLES = {
 const DB = {
   [TABLES.USERS]: [],
   [TABLES.BOARDS]: [],
-  [TABLES.COLUMNS]: [],
   [TABLES.TASKS]: []
 };
 
