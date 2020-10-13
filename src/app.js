@@ -8,11 +8,15 @@ const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
 // Helpers
 const handleError = require('./helpers/errors').handleMiddlewareError;
+// Utils
+const logger = require('./utils/logger');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
 app.use(express.json());
+
+app.use(logger);
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
