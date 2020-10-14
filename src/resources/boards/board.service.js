@@ -1,39 +1,18 @@
 const { Board } = require('./board.model');
-const boardValidation = require('./board.validation');
 const boardRepo = require('./board.memory.repository');
+const taskService = require('../tasks/task.service');
 
-const getAll = async () => {
-  const board = await boardRepo.getAll();
+const getAll = async () => boardRepo.getAll();
 
-  return board;
-};
+const create = async data => boardRepo.create(new Board(data));
 
-const create = async data => {
-  boardValidation.isData(data);
+const get = async id => boardRepo.get(id);
 
-  const board = await boardRepo.create(new Board(data));
-
-  return board;
-};
-
-const get = async id => {
-  const board = await boardRepo.get(id);
-
-  return board;
-};
-
-const update = async (id, data) => {
-  boardValidation.isData(data);
-
-  await boardRepo.get(id);
-  const board = await boardRepo.update(id, data);
-
-  return board;
-};
+const update = async (id, data) => boardRepo.update(id, data);
 
 const deleteBoard = async id => {
-  await boardRepo.get(id);
   const board = await boardRepo.delete(id);
+  await taskService.deleteAll(id);
 
   return board;
 };

@@ -2,10 +2,10 @@ const Joi = require('joi');
 const { RestError } = require('../../helpers/errors');
 
 const schema = Joi.object({
-  title: Joi.string(),
-  order: Joi.number(),
-  description: Joi.string()
-}).and('title', 'order', 'description');
+  title: Joi.string().required(),
+  order: Joi.number().required(),
+  description: Joi.string().required()
+});
 
 const validate = async (req, res, next) => {
   try {
