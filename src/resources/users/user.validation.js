@@ -1,15 +1,20 @@
+const Joi = require('joi');
 const { RestError } = require('../../helpers/errors');
-const validation = require('../../helpers/validation');
 
-const isData = ({ name, login, password }) => {
+const schema = Joi.object({
+  name: Joi.string(),
+  login: Joi.string(),
+  password: Joi.string()
+}).and('name', 'login', 'password');
+
+const validate = async (req, res, next) => {
   try {
-    validation
-      .isString(name, 'name')
-      .isString(login, 'login')
-      .isString(password, 'password');
+    const { name, login, password } = req.body;
+    await schema.validateAsync({ name, login, password });
+    return next();
   } catch (e) {
-    throw new RestError(400, `Invalid user data. ${e.message}`);
+    return next(new RestError(400, `Invalid user data. ${e.message}`));
   }
 };
 
-module.exports = { isData };
+module.exports = { validate };

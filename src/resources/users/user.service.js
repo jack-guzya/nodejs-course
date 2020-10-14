@@ -1,6 +1,6 @@
 const User = require('./user.model');
-const userValidation = require('./user.validation');
 const usersRepo = require('./user.memory.repository');
+const taskService = require('../tasks/task.service');
 
 const getAll = async () => {
   const users = await usersRepo.getAll();
@@ -15,25 +15,20 @@ const get = async id => {
 };
 
 const create = async data => {
-  userValidation.isData(data);
-
   const user = await usersRepo.create(new User(data));
 
   return User.toResponse(user);
 };
 
 const update = async (id, data) => {
-  userValidation.isData(data);
-
-  await usersRepo.get(id);
   const user = await usersRepo.update(id, data);
 
   return User.toResponse(user);
 };
 
 const deleteUser = async id => {
-  await usersRepo.get(id);
   const user = await usersRepo.delete(id);
+  await taskService.deleteUserInTasks(id);
 
   return User.toResponse(user);
 };

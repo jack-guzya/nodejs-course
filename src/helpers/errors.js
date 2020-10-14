@@ -1,6 +1,6 @@
 class RestError extends Error {
-  constructor(status, message) {
-    super(message);
+  constructor(status, ...message) {
+    super(message.join(' '));
 
     this.statusCode = status;
   }

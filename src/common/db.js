@@ -10,15 +10,17 @@ const DB = {
   [TABLES.TASKS]: []
 };
 
-const getEntryIndex = (table, id) =>
+const deepCopy = obj => JSON.parse(JSON.stringify(obj));
+
+const getEntityIndex = (table, id) =>
   DB[table].findIndex(entry => entry.id === id);
 
-const getAll = async table => [...DB[table]];
+const getAll = async table => deepCopy(DB[table]);
 
 const get = table => async id => {
   const entity = DB[table].find(item => item.id === id);
 
-  return entity ? { ...entity } : null;
+  return entity ? deepCopy(entity) : null;
 };
 
 const create = table => async entity => {
@@ -28,7 +30,7 @@ const create = table => async entity => {
 };
 
 const update = table => async (id, params) => {
-  const index = getEntryIndex(table, id);
+  const index = getEntityIndex(table, id);
 
   if (index === -1) {
     return null;
@@ -36,11 +38,11 @@ const update = table => async (id, params) => {
 
   DB[table][index] = { ...DB[table][index], ...params };
 
-  return { ...DB[table][index] } || null;
+  return deepCopy(DB[table][index]) || null;
 };
 
 const deleteEntry = table => async id => {
-  const index = getEntryIndex(table, id);
+  const index = getEntityIndex(table, id);
 
   if (index === -1) {
     return null;
@@ -51,7 +53,7 @@ const deleteEntry = table => async id => {
   return entry;
 };
 
-const find = table => async callback => DB[table].filter(callback);
+const find = table => async callback => deepCopy(DB[table].filter(callback));
 
 module.exports = {
   TABLES,
