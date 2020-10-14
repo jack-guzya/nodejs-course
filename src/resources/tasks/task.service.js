@@ -1,56 +1,23 @@
 const { Task } = require('./task.model');
-const taskValidation = require('./task.validation');
 const taskRepo = require('./task.memory.repository');
 
-const getAll = async boardId => {
-  const tasks = await taskRepo.getByBoardId(boardId);
+const getAll = async boardId => taskRepo.getAll(boardId);
 
-  return tasks;
-};
+const create = async data => taskRepo.create(new Task(data));
 
-const create = async data => {
-  taskValidation.isData(data);
+const get = async queryParams => taskRepo.get(queryParams);
 
-  const task = await taskRepo.create(new Task(data));
+const update = async (queryParams, data) => taskRepo.update(queryParams, data);
 
-  return task;
-};
+const deleteTask = async queryParams => taskRepo.delete(queryParams);
 
-const get = async ({ id, boardId }) => {
-  const task = await taskRepo.get({ id, boardId });
-
-  return task;
-};
-
-const update = async ({ id, boardId }, data) => {
-  taskValidation.isData(data);
-
-  const task = await taskRepo.get({ id, boardId });
-  const board = await taskRepo.update(task.id, data);
-
-  return board;
-};
-
-const deleteTask = async ({ id, boardId }) => {
-  const task = await taskRepo.get({ id, boardId });
-  const deletedTask = await taskRepo.delete(task.id);
-
-  return deletedTask;
-};
-
-const deleteAll = async boardId => {
-  const tasks = await taskRepo.deleteAll(boardId);
-
-  return tasks;
-};
+const deleteAll = async boardId => taskRepo.deleteAll(boardId);
 
 const deleteUserInTasks = async userId => {
   const tasks = await taskRepo.find(task => task.userId === userId);
 
   tasks.length &&
-    tasks.forEach(
-      async task => await taskRepo.update(task.id, { userId: null })
-    );
+    tasks.forEach(async task => await taskRepo.update(task, { userId: null }));
 
   return tasks;
 };
