@@ -7,7 +7,7 @@ const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
 // Helpers
-const handleError = require('./helpers/errors').handleMiddlewareError;
+const { handleError, sendError } = require('./helpers/errors');
 // Utils
 const logger = require('./utils/logger');
 
@@ -16,9 +16,9 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
 app.use(express.json());
 
-app.use(logger);
-
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+app.use(logger.request);
 
 app.use('/', (req, res, next) => {
   if (req.originalUrl === '/') {
@@ -34,6 +34,6 @@ app.use('/boards', boardRouter);
 
 boardRouter.use('/:boardId/tasks', taskRouter);
 
-app.use(handleError);
+app.use(handleError, logger.requestError, sendError);
 
 module.exports = app;
