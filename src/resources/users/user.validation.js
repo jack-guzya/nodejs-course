@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { RestError } = require('../../helpers/errors');
+const { RestError } = require('../../utils/error-handler.js');
 
 const schema = Joi.object({
   name: Joi.string().required(),

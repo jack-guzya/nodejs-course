@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { asyncHandleError } = require('../../helpers/errors');
+const { asyncHandleError } = require('../../utils/error-handler.js');
 const boardService = require('./board.service');
 const { validate } = require('./board.validation');
 

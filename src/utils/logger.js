@@ -4,7 +4,7 @@ const { combine, printf } = format;
 
 const isEmpty = obj => typeof obj === 'object' && !Object.entries(obj).length;
 const formatObj = obj => (isEmpty(obj) ? '-' : JSON.stringify(obj));
-
+const formatError = ({ message }) => `Error: ${message}`;
 const customFormat = printf(
   ({ level, message, timestamp }) => `${timestamp} [${level}]: ${message}`
 );
@@ -25,7 +25,7 @@ const logger = createLogger({
   ]
 });
 
-const requestLogger = (req, res, next) => {
+const loggerMiddleware = (req, res, next) => {
   const { url, method } = req;
   const query = formatObj(req.query);
   const body = formatObj(req.body);
@@ -36,19 +36,38 @@ const requestLogger = (req, res, next) => {
     const ms = Date.now() - start;
 
     logger.info(
-      `${method} ${statusCode} [${ms}ms] \n${url} \nquery: ${query} \nbody: ${body}\n`
+      `${method} ${statusCode} [${ms}ms] \nUrl: ${url} \nQuery: ${query} \nBody: ${body}\n`
     );
   });
 
   next();
 };
 
-const requestErrorLogger = (err, req, res, next) => {
-  const { statusCode, message } = err;
+const serverErrorMiddleware = (err, req, res, next) => {
+  if (err.statusCode) {
+    return next(err);
+  }
 
-  logger.error(`${req.method} ${statusCode}\n${message}\n`);
+  logger.error(`${req.method} ${req.url}\n${formatError(err)}\n`);
 
   next(err);
 };
 
-module.exports = { request: requestLogger, requestError: requestErrorLogger };
+const clientErrorMiddleware = (err, req, res, next) => {
+  if (!err.statusCode) {
+    return next(err);
+  }
+
+  const { statusCode, message } = err;
+  logger.error(`${req.method} ${statusCode}\nUrl: ${req.url}\n${message}\n`);
+
+  next(err);
+};
+
+module.exports = {
+  log: loggerMiddleware,
+  logServerError: serverErrorMiddleware,
+  logClientError: clientErrorMiddleware,
+  error: logger.error.bind(logger),
+  formatError
+};

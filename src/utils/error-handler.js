@@ -6,7 +6,8 @@ class RestError extends Error {
   }
 }
 
-const handleError = (err, req, res, next) => {
+// eslint-disable-next-line no-unused-vars
+const handlerMiddleware = (err, req, res, next) => {
   const { statusCode, message } = err;
 
   const error = {
@@ -15,11 +16,8 @@ const handleError = (err, req, res, next) => {
     message: statusCode ? message : 'Internal Server Error!'
   };
 
-  next(error);
+  res.status(error.statusCode).json(error);
 };
-
-// eslint-disable-next-line no-unused-vars
-const sendError = (err, req, res, next) => res.status(err.statusCode).json(err);
 
 const asyncHandleError = callback => async (req, res, next) => {
   try {
@@ -31,7 +29,6 @@ const asyncHandleError = callback => async (req, res, next) => {
 
 module.exports = {
   RestError,
-  handleError,
-  sendError,
+  handle: handlerMiddleware,
   asyncHandleError
 };

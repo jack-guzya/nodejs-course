@@ -1,5 +1,5 @@
 const DB = require('../../common/db');
-const { RestError } = require('../../helpers/errors');
+const { RestError } = require('../../utils/error-handler.js');
 
 const getAll = async () => DB.getAll(DB.TABLES.USERS);
 
