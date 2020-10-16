@@ -1,26 +1,39 @@
 const { createLogger, format, transports } = require('winston');
 const { finished } = require('stream');
-const { combine, printf } = format;
+const { combine, printf, colorize } = format;
 
 const isEmpty = obj => typeof obj === 'object' && !Object.entries(obj).length;
 const formatObj = obj => (isEmpty(obj) ? '-' : JSON.stringify(obj));
 const formatError = ({ message }) => `Error: ${message}`;
-const customFormat = printf(
-  ({ level, message, timestamp }) => `${timestamp} [${level}]: ${message}`
-);
+
+const customFormatLog = ({ level, message, timestamp }) =>
+  `${timestamp} [${level}]: ${message}`;
+
+const formatConsoleLog = () =>
+  combine(
+    colorize({
+      all: true,
+      colors: { info: 'green', error: 'red' }
+    }),
+    printf(customFormatLog)
+  );
 
 const logger = createLogger({
-  format: format.colorize({
-    all: true,
-    colors: { info: 'green', error: 'red' }
-  }),
+  format: format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss Z' }),
   transports: [
     new transports.Console({
       level: 'info',
-      format: combine(
-        format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss Z' }),
-        customFormat
-      )
+      format: formatConsoleLog()
+    }),
+    new transports.File({
+      filename: './logs/error.log',
+      level: 'error',
+      format: printf(customFormatLog)
+    }),
+    new transports.File({
+      filename: './logs/info.log',
+      level: 'info',
+      format: printf(customFormatLog)
     })
   ]
 });
