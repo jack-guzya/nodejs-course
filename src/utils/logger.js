@@ -2,9 +2,22 @@ const { createLogger, format, transports } = require('winston');
 const { finished } = require('stream');
 const { combine, printf, colorize } = format;
 
-const isEmpty = obj => typeof obj === 'object' && !Object.entries(obj).length;
+const isEmpty = obj => typeof obj === 'object' && !Object.keys(obj).length;
 const formatObj = obj => (isEmpty(obj) ? '-' : JSON.stringify(obj));
 const formatError = ({ message }) => `Error: ${message}`;
+const hideFields = (obj, ...keys) => {
+  if (typeof obj !== 'object') {
+    return obj;
+  }
+
+  const isKey = key => !!keys.find(item => item === key);
+  const hide = value => '*'.repeat(value.length);
+  const handleEntries = ([key, value]) =>
+    isKey(key) ? [key, hide(value)] : [key, value];
+  const entries = Object.entries(obj).map(handleEntries);
+
+  return Object.fromEntries(entries);
+};
 
 const customFormatLog = ({ level, message, timestamp }) =>
   `${timestamp} [${level}]: ${message}`;
@@ -41,7 +54,7 @@ const logger = createLogger({
 const loggerMiddleware = (req, res, next) => {
   const { url, method } = req;
   const query = formatObj(req.query);
-  const body = formatObj(req.body);
+  const body = formatObj(hideFields(req.body, 'password'));
   const start = Date.now();
 
   finished(res, () => {
