@@ -2,98 +2,110 @@ const { createLogger, format, transports } = require('winston');
 const { finished } = require('stream');
 const { combine, printf, colorize } = format;
 
-const isEmpty = obj => typeof obj === 'object' && !Object.keys(obj).length;
-const formatObj = obj => (isEmpty(obj) ? '-' : JSON.stringify(obj));
-const formatError = ({ message }) => `Error: ${message}`;
-const hideFields = (obj, ...keys) => {
-  if (typeof obj !== 'object') {
-    return obj;
-  }
+const helpers = {
+  hideObjValues: (obj, keys) => {
+    if (typeof obj !== 'object' || !keys.length) {
+      return obj;
+    }
 
-  const isKey = key => !!keys.find(item => item === key);
-  const hide = value => '*'.repeat(value.length);
-  const handleEntries = ([key, value]) =>
-    isKey(key) ? [key, hide(value)] : [key, value];
-  const entries = Object.entries(obj).map(handleEntries);
+    const isKey = key => !!keys.find(item => item === key);
+    const hide = value => '*'.repeat(value.length);
+    const handleEntries = ([key, value]) =>
+      isKey(key) ? [key, hide(value)] : [key, value];
+    const entries = Object.entries(obj).map(handleEntries);
 
-  return Object.fromEntries(entries);
+    return Object.fromEntries(entries);
+  },
+
+  formatObj(obj, ...hiddenKeys) {
+    return JSON.stringify(this.hideObjValues(obj, hiddenKeys));
+  },
+
+  formatError: ({ message }) => `Error: ${message}\n`,
+
+  formatLog: ({ level, message, timestamp }) =>
+    `${timestamp} [${level}]: ${message}`
 };
 
-const customFormatLog = ({ level, message, timestamp }) =>
-  `${timestamp} [${level}]: ${message}`;
+const options = {
+  console: {
+    level: 'info',
+    format: combine(
+      colorize({
+        all: true,
+        colors: { info: 'green', error: 'red' }
+      }),
+      printf(helpers.formatLog)
+    )
+  },
 
-const formatConsoleLog = () =>
-  combine(
-    colorize({
-      all: true,
-      colors: { info: 'green', error: 'red' }
-    }),
-    printf(customFormatLog)
-  );
+  errorFile: {
+    filename: './logs/error.log',
+    level: 'error',
+    maxsize: 5242880,
+    format: printf(helpers.formatLog)
+  },
+
+  infoFile: {
+    filename: './logs/info.log',
+    level: 'info',
+    maxsize: 5242880,
+    format: printf(helpers.formatLog)
+  }
+};
 
 const logger = createLogger({
   format: format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss Z' }),
   transports: [
-    new transports.Console({
-      level: 'info',
-      format: formatConsoleLog()
-    }),
-    new transports.File({
-      filename: './logs/error.log',
-      level: 'error',
-      format: printf(customFormatLog)
-    }),
-    new transports.File({
-      filename: './logs/info.log',
-      level: 'info',
-      format: printf(customFormatLog)
-    })
+    new transports.Console(options.console),
+    new transports.File(options.errorFile),
+    new transports.File(options.infoFile)
   ]
 });
 
-const loggerMiddleware = (req, res, next) => {
-  const { url, method } = req;
-  const query = formatObj(req.query);
-  const body = formatObj(hideFields(req.body, 'password'));
-  const start = Date.now();
+const middleware = {
+  request: (req, res, next) => {
+    const { url, method } = req;
+    const query = helpers.formatObj(req.query);
+    const body = helpers.formatObj(req.body, 'password');
+    const start = Date.now();
 
-  finished(res, () => {
-    const { statusCode } = res;
-    const ms = Date.now() - start;
+    finished(res, () => {
+      const { statusCode } = res;
+      const ms = Date.now() - start;
 
-    logger.info(
-      `${method} ${statusCode} [${ms}ms] \nUrl: ${url} \nQuery: ${query} \nBody: ${body}\n`
-    );
-  });
+      logger.info(
+        `${method} ${statusCode} [${ms}ms] \nUrl: ${url} \nQuery: ${query} \nBody: ${body}\n`
+      );
+    });
 
-  next();
-};
+    next();
+  },
 
-const serverErrorMiddleware = (err, req, res, next) => {
-  if (err.statusCode) {
-    return next(err);
+  serverError: (err, req, res, next) => {
+    if (err.statusCode) {
+      return next(err);
+    }
+
+    logger.error(`${req.method} ${req.url}\n${helpers.formatError(err)}\n`);
+
+    next(err);
+  },
+
+  clientError: (err, req, res, next) => {
+    if (!err.statusCode) {
+      return next(err);
+    }
+
+    const { statusCode, message } = err;
+    logger.error(`${req.method} ${statusCode}\nUrl: ${req.url}\n${message}\n`);
+
+    next(err);
   }
-
-  logger.error(`${req.method} ${req.url}\n${formatError(err)}\n`);
-
-  next(err);
-};
-
-const clientErrorMiddleware = (err, req, res, next) => {
-  if (!err.statusCode) {
-    return next(err);
-  }
-
-  const { statusCode, message } = err;
-  logger.error(`${req.method} ${statusCode}\nUrl: ${req.url}\n${message}\n`);
-
-  next(err);
 };
 
 module.exports = {
-  log: loggerMiddleware,
-  logServerError: serverErrorMiddleware,
-  logClientError: clientErrorMiddleware,
-  error: logger.error.bind(logger),
-  formatError
+  middleware,
+  error: ({ message }) => logger.error(helpers.formatError({ message })),
+  info: logger.info.bind(logger)
 };

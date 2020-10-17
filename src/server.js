@@ -3,14 +3,15 @@ const app = require('./app');
 const logger = require('./utils/logger');
 
 const server = app.listen(PORT, () =>
-  console.log(`App is running on http://localhost:${PORT}`)
+  logger.info(`App is running on http://localhost:${PORT}`)
 );
 
 process
-  .on('unhandledRejection', e => {
-    throw e;
+  .on('unhandledRejection', reason => {
+    throw reason;
   })
   .on('uncaughtException', e => {
-    logger.error(logger.formatError(e));
+    logger.error(e);
     server.close();
+    process.exitCode = 1;
   });
