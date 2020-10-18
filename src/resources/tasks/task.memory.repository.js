@@ -1,14 +1,9 @@
 const DB = require('../../common/db');
-const { RestError } = require('../../helpers/errors');
+const { RestError } = require('../../utils/error-handler.js');
 
-const getAll = async () => DB.getAll(DB.TABLES.TASKS);
 const find = DB.find(DB.TABLES.TASKS);
 
-const getByBoardId = async boardId => {
-  const tasks = await find(task => task.boardId === boardId);
-
-  return tasks;
-};
+const getAll = async boardId => find(task => task.boardId === boardId);
 
 const get = async ({ id, boardId }) => {
   const [task] = await find(item => item.id === id && item.boardId === boardId);
@@ -20,20 +15,24 @@ const get = async ({ id, boardId }) => {
   return task;
 };
 
-const update = async (id, params) => {
-  const updatedTask = await DB.update(DB.TABLES.TASKS)(id, params);
+const create = async entity => DB.create(DB.TABLES.TASKS)(entity);
 
-  return updatedTask;
+const update = async ({ id, boardId }, params) => {
+  await get({ id, boardId });
+  const task = await DB.update(DB.TABLES.TASKS)(id, params);
+
+  return task;
 };
 
-const deleteTask = async id => {
-  const deleted = await DB.delete(DB.TABLES.TASKS)(id);
+const deleteTask = async ({ id, boardId }) => {
+  await get({ id, boardId });
+  const task = await DB.delete(DB.TABLES.TASKS)(id);
 
-  return deleted;
+  return task;
 };
 
 const deleteAll = async boardId => {
-  const tasks = await getByBoardId(boardId);
+  const tasks = await getAll(boardId);
 
   tasks.length &&
     tasks.forEach(async task => await DB.delete(DB.TABLES.TASKS)(task.id));
@@ -41,15 +40,8 @@ const deleteAll = async boardId => {
   return tasks;
 };
 
-const create = async entity => {
-  const task = await DB.create(DB.TABLES.TASKS)(entity);
-
-  return task;
-};
-
 module.exports = {
   getAll,
-  getByBoardId,
   get,
   create,
   update,

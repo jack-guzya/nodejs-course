@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const { asyncHandleError } = require('../../helpers/errors');
-// Services
+const { asyncHandleError } = require('../../utils/error-handler.js');
 const boardService = require('./board.service');
-const taskService = require('../tasks/task.service');
+const { validate } = require('./board.validation');
 
 router.route('/').get(
   asyncHandleError(async (req, res) => {
@@ -12,11 +11,9 @@ router.route('/').get(
 );
 
 router.route('/').post(
+  validate,
   asyncHandleError(async (req, res) => {
-    const board = await boardService.create({
-      title: req.body.title,
-      columns: req.body.columns
-    });
+    const board = await boardService.create(req.body);
     res.json(board);
   })
 );
@@ -29,11 +26,9 @@ router.route('/:id').get(
 );
 
 router.route('/:id').put(
+  validate,
   asyncHandleError(async (req, res) => {
-    const board = await boardService.update(req.params.id, {
-      title: req.body.title,
-      columns: req.body.columns
-    });
+    const board = await boardService.update(req.params.id, req.body);
     res.json(board);
   })
 );
@@ -41,8 +36,6 @@ router.route('/:id').put(
 router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
     await boardService.delete(req.params.id);
-    await taskService.deleteAll(req.params.id);
-
     res.sendStatus(204);
   })
 );

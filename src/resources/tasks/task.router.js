@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true });
-const { asyncHandleError } = require('../../helpers/errors');
+const { asyncHandleError } = require('../../utils/error-handler.js');
 const taskService = require('./task.service');
+const { validate } = require('./task.validation');
 
 router.route('/').get(
   asyncHandleError(async (req, res) => {
@@ -10,13 +11,10 @@ router.route('/').get(
 );
 
 router.route('/').post(
+  validate,
   asyncHandleError(async (req, res) => {
     const task = await taskService.create({
-      title: req.body.title,
-      order: req.body.order,
-      description: req.body.description,
-      userId: req.body.userId,
-      columnId: req.body.columnId,
+      ...req.body,
       boardId: req.body.boardId || req.params.boardId
     });
     res.json(task);
@@ -25,40 +23,25 @@ router.route('/').post(
 
 router.route('/:id').get(
   asyncHandleError(async (req, res) => {
-    const task = await taskService.get({
-      id: req.params.id,
-      boardId: req.params.boardId
-    });
+    const task = await taskService.get(req.params);
     res.json(task);
   })
 );
 
 router.route('/:id').put(
+  validate,
   asyncHandleError(async (req, res) => {
-    const task = await taskService.update(
-      {
-        id: req.params.id,
-        boardId: req.params.boardId
-      },
-      {
-        title: req.body.title,
-        order: req.body.order,
-        description: req.body.description,
-        userId: req.body.userId,
-        columnId: req.body.columnId,
-        boardId: req.body.boardId || req.params.boardId
-      }
-    );
+    const task = await taskService.update(req.params, {
+      ...req.body,
+      boardId: req.body.boardId || req.params.boardId
+    });
     res.json(task);
   })
 );
 
 router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
-    await taskService.delete({
-      id: req.params.id,
-      boardId: req.params.boardId
-    });
+    await taskService.delete(req.params);
     res.sendStatus(204);
   })
 );

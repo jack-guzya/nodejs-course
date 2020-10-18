@@ -1,5 +1,5 @@
 const DB = require('../../common/db');
-const { RestError } = require('../../helpers/errors');
+const { RestError } = require('../../utils/error-handler.js');
 
 const getAll = async () => DB.getAll(DB.TABLES.BOARDS);
 
@@ -13,20 +13,18 @@ const get = async id => {
   return board;
 };
 
+const create = async params => DB.create(DB.TABLES.BOARDS)(params);
+
 const update = async (id, params) => {
+  await get(id);
   const board = await DB.update(DB.TABLES.BOARDS)(id, params);
 
   return board;
 };
 
 const deleteBoard = async id => {
+  await get(id);
   const board = await DB.delete(DB.TABLES.BOARDS)(id);
-
-  return board;
-};
-
-const create = async params => {
-  const board = await DB.create(DB.TABLES.BOARDS)(params);
 
   return board;
 };
