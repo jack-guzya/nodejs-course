@@ -1,4 +1,4 @@
-const DB = require('../../common/db');
+const DB = require('../../common/inMemoryDb');
 const { RestError } = require('../../utils/error-handler.js');
 
 const find = DB.find(DB.TABLES.TASKS);
@@ -19,16 +19,14 @@ const create = async entity => DB.create(DB.TABLES.TASKS)(entity);
 
 const update = async ({ id, boardId }, params) => {
   await get({ id, boardId });
-  const task = await DB.update(DB.TABLES.TASKS)(id, params);
 
-  return task;
+  return DB.update(DB.TABLES.TASKS)(id, params);
 };
 
 const deleteTask = async ({ id, boardId }) => {
   await get({ id, boardId });
-  const task = await DB.delete(DB.TABLES.TASKS)(id);
 
-  return task;
+  return DB.delete(DB.TABLES.TASKS)(id);
 };
 
 const deleteAll = async boardId => {

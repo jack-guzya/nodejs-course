@@ -1,4 +1,4 @@
-const DB = require('../../common/db');
+const DB = require('../../common/inMemoryDb');
 const { RestError } = require('../../utils/error-handler.js');
 
 const getAll = async () => DB.getAll(DB.TABLES.BOARDS);
@@ -17,16 +17,14 @@ const create = async params => DB.create(DB.TABLES.BOARDS)(params);
 
 const update = async (id, params) => {
   await get(id);
-  const board = await DB.update(DB.TABLES.BOARDS)(id, params);
 
-  return board;
+  return DB.update(DB.TABLES.BOARDS)(id, params);
 };
 
 const deleteBoard = async id => {
   await get(id);
-  const board = await DB.delete(DB.TABLES.BOARDS)(id);
 
-  return board;
+  return DB.delete(DB.TABLES.BOARDS)(id);
 };
 
 module.exports = { getAll, get, create, update, delete: deleteBoard };
