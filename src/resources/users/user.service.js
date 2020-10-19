@@ -1,5 +1,5 @@
 const User = require('./user.model');
-const usersRepo = require('./user.memory.repository');
+const usersRepo = require('./user.db.repository');
 const taskService = require('../tasks/task.service');
 
 const getAll = async () => {
@@ -15,7 +15,7 @@ const get = async id => {
 };
 
 const create = async data => {
-  const user = await usersRepo.create(new User(data));
+  const user = await usersRepo.create(data);
 
   return User.toResponse(user);
 };
