@@ -13,6 +13,7 @@ const connect = callback => {
   db.on('error', e => logger.error(e));
   db.once('open', () => {
     logger.info('Connection to the database was successful!');
+    db.dropDatabase();
     callback();
   });
 };
