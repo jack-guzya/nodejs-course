@@ -1,7 +1,8 @@
 const router = require('express').Router({ mergeParams: true });
-const { asyncHandleError } = require('../../utils/error-handler.js');
+const { StatusCodes } = require('http-status-codes');
 const taskService = require('./task.service');
 const { validate } = require('./task.validation');
+const { asyncHandleError } = require('../../utils/error-handler.js');
 
 router.route('/').get(
   asyncHandleError(async (req, res) => {
@@ -42,7 +43,7 @@ router.route('/:id').put(
 router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
     await taskService.delete(req.params);
-    res.sendStatus(204);
+    res.sendStatus(StatusCodes.NO_CONTENT);
   })
 );
 

@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { StatusCodes } = require('http-status-codes');
 const boardService = require('./board.service');
 const Board = require('./board.model');
 const { validate } = require('./board.validation');
@@ -37,7 +38,7 @@ router.route('/:id').put(
 router.route('/:id').delete(
   asyncHandleError(async (req, res) => {
     await boardService.delete(req.params.id);
-    res.sendStatus(204);
+    res.sendStatus(StatusCodes.NO_CONTENT);
   })
 );
 

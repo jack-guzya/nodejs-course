@@ -1,9 +1,9 @@
 const Board = require('./board.model.js');
-const { RestError } = require('../../utils/error-handler.js');
+const { NotFoundError } = require('../../utils/error-handler.js');
 
 const checkBoardExists = (board, id) => {
   if (!board) {
-    throw new RestError(404, `Board not found: ${id}`);
+    throw new NotFoundError(`Board not found: ${id}`);
   }
 };
 
