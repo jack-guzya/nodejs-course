@@ -5,7 +5,8 @@ const logger = require('../utils/logger');
 const connect = callback => {
   mongoose.connect(MONGO_CONNECTION_STRING, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
   });
 
   const db = mongoose.connection;
