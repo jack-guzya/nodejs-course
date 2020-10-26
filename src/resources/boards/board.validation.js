@@ -1,18 +1,32 @@
 const Joi = require('joi');
-const { RestError } = require('../../utils/error-handler.js');
+const { rest } = require('../../errors');
+
+const columnSchema = Joi.object({
+  id: Joi.string(),
+  title: Joi.string()
+    .min(3)
+    .max(30),
+  order: Joi.number()
+    .min(0)
+    .integer()
+});
 
 const schema = Joi.object({
-  title: Joi.string().required(),
-  columns: Joi.array()
+  title: Joi.string()
+    .min(3)
+    .max(30)
+    .required(),
+  columns: Joi.array().items(columnSchema)
 });
 
 const validate = async (req, res, next) => {
   try {
     const { title, columns = [] } = req.body;
     await schema.validateAsync({ title, columns });
+
     return next();
   } catch (e) {
-    return next(new RestError(400, `Invalid board data. ${e.message}`));
+    return next(new rest.BadRequest(`Invalid board data. ${e.message}`));
   }
 };
 

@@ -1,26 +1,20 @@
-const { Task } = require('./task.model');
-const taskRepo = require('./task.memory.repository');
+const taskRepo = require('./task.db.repository');
 
-const getAll = async boardId => taskRepo.getAll(boardId);
+const getAll = boardId => taskRepo.getAll(boardId);
 
-const create = async data => taskRepo.create(new Task(data));
+const create = task => taskRepo.create(task);
 
-const get = async queryParams => taskRepo.get(queryParams);
+const get = ({ id, boardId }) => taskRepo.get({ id, boardId });
 
-const update = async (queryParams, data) => taskRepo.update(queryParams, data);
+const update = ({ id, boardId }, data) =>
+  taskRepo.update({ id, boardId }, data);
 
-const deleteTask = async queryParams => taskRepo.delete(queryParams);
+const deleteTask = ({ id, boardId }) => taskRepo.delete({ id, boardId });
 
-const deleteAll = async boardId => taskRepo.deleteAll(boardId);
+const deleteAll = boardId => taskRepo.deleteAll(boardId);
 
-const deleteUserInTasks = async userId => {
-  const tasks = await taskRepo.find(task => task.userId === userId);
-
-  tasks.length &&
-    tasks.forEach(async task => await taskRepo.update(task, { userId: null }));
-
-  return tasks;
-};
+const deleteUserInTasks = userId =>
+  taskRepo.updateMany({ userId }, { userId: null });
 
 module.exports = {
   create,

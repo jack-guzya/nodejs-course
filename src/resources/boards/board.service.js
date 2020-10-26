@@ -1,10 +1,9 @@
-const { Board } = require('./board.model');
-const boardRepo = require('./board.memory.repository');
+const boardRepo = require('./board.db.repository');
 const taskService = require('../tasks/task.service');
 
 const getAll = async () => boardRepo.getAll();
 
-const create = async data => boardRepo.create(new Board(data));
+const create = async data => boardRepo.create(data);
 
 const get = async id => boardRepo.get(id);
 

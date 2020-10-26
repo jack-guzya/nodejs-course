@@ -1,17 +1,10 @@
 const { PORT } = require('./common/config');
+const logger = require('./logger');
+const db = require('./common/db');
 const app = require('./app');
-const logger = require('./utils/logger');
 
-const server = app.listen(PORT, () =>
-  logger.info(`App is running on http://localhost:${PORT}`)
-);
-
-process
-  .on('unhandledRejection', reason => {
-    throw reason;
-  })
-  .on('uncaughtException', e => {
-    logger.error(e);
-    server.close();
-    process.exitCode = 1;
-  });
+db.connect(() => {
+  app.listen(PORT, () =>
+    logger.info(`App is running on http://localhost:${PORT}`)
+  );
+});
