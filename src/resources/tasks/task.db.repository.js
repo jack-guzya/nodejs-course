@@ -1,9 +1,9 @@
 const Task = require('./task.model.js');
-const { NotFoundError } = require('../../utils/error-handler.js');
+const { rest } = require('../../errors');
 
 const checkTaskExists = (task, id) => {
   if (!task) {
-    throw new NotFoundError(`Task not found: ${id}`);
+    throw new rest.NotFound(`Task not found: ${id}`);
   }
 };
 

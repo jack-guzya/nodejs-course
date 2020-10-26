@@ -1,9 +1,9 @@
 const User = require('./user.model');
-const { NotFoundError } = require('../../utils/error-handler.js');
+const { rest } = require('../../errors');
 
 const checkUserExists = (user, id) => {
   if (!user) {
-    throw new NotFoundError(`User not found: ${id}`);
+    throw new rest.NotFound(`User not found: ${id}`);
   }
 };
 

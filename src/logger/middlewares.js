@@ -16,7 +16,7 @@ const clientError = logger => (err, req, res, next) => {
   }
 
   const { statusCode, message } = err;
-  logger(`${req.method} ${statusCode}\nUrl: ${req.url}\n${message}\n`);
+  logger(`${req.method} ${statusCode}\n url: ${req.url}\n ${message}\n`);
 
   next(err);
 };

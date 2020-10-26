@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { MONGO_CONNECTION_STRING } = require('./config');
-const logger = require('../utils/logger');
+const logger = require('../logger');
 
 const connect = callback => {
   mongoose.connect(MONGO_CONNECTION_STRING, {

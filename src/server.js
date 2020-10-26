@@ -1,4 +1,4 @@
-const logger = require('./utils/logger');
+const logger = require('./logger');
 const { PORT } = require('./common/config');
 const db = require('./common/db');
 const app = require('./app');

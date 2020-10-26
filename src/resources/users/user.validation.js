@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { BadRequestError } = require('../../utils/error-handler.js');
+const { rest } = require('../../errors');
 
 const schema = Joi.object({
   name: Joi.string().required(),
@@ -14,7 +14,7 @@ const validate = async (req, res, next) => {
 
     return next();
   } catch (e) {
-    return next(new BadRequestError(`Invalid user data. ${e.message}`));
+    return next(new rest.BadRequest(`Invalid user data. ${e.message}`));
   }
 };
 
