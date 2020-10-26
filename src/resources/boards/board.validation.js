@@ -1,9 +1,22 @@
 const Joi = require('joi');
 const { rest } = require('../../errors');
 
+const columnSchema = Joi.object({
+  id: Joi.string(),
+  title: Joi.string()
+    .min(3)
+    .max(30),
+  order: Joi.number()
+    .min(0)
+    .integer()
+});
+
 const schema = Joi.object({
-  title: Joi.string().required(),
-  columns: Joi.array()
+  title: Joi.string()
+    .min(3)
+    .max(30)
+    .required(),
+  columns: Joi.array().items(columnSchema)
 });
 
 const validate = async (req, res, next) => {
