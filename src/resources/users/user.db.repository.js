@@ -16,6 +16,8 @@ const get = async id => {
   return user;
 };
 
+const getByFilter = async filter => User.find(filter);
+
 const create = async params => User.create(params);
 
 const update = async (id, params) => {
@@ -32,4 +34,11 @@ const deleteUser = async id => {
   return user;
 };
 
-module.exports = { getAll, get, create, update, delete: deleteUser };
+module.exports = {
+  getAll,
+  get,
+  getByFilter,
+  create,
+  update,
+  delete: deleteUser
+};

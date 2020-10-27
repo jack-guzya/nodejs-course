@@ -11,4 +11,6 @@ const encrypt = (req, res, next) => {
     .catch(e => next(e));
 };
 
-module.exports = { encrypt };
+const compare = (input, hash) => bcrypt.compare(input, hash);
+
+module.exports = { encrypt, compare };
