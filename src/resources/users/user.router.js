@@ -4,6 +4,7 @@ const usersService = require('./user.service');
 const User = require('./user.model');
 const { validate } = require('./user.validation');
 const error = require('../../errors');
+const crypt = require('../../crypt');
 
 router.route('/').get(
   error.wrapper(async (req, res) => {
@@ -14,6 +15,7 @@ router.route('/').get(
 
 router.route('/').post(
   validate,
+  crypt.encrypt,
   error.wrapper(async (req, res) => {
     const user = await usersService.create(req.body);
     res.json(User.toResponse(user));
