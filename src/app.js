@@ -10,6 +10,7 @@ const taskRouter = require('./resources/tasks/task.router');
 
 const error = require('./errors');
 const logger = require('./logger').middleware;
+const token = require('./token');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -29,11 +30,11 @@ app.use('/', (req, res, next) => {
 
 app.use('/login', loginRouter);
 
-app.use('/users', userRouter);
+app.use('/users', token.check, userRouter);
 
-app.use('/boards', boardRouter);
+app.use('/boards', token.check, boardRouter);
 
-boardRouter.use('/:boardId/tasks', taskRouter);
+boardRouter.use('/:boardId/tasks', token.check, taskRouter);
 
 app.use(logger.serverError, logger.clientError);
 

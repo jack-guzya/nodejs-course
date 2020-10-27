@@ -6,8 +6,8 @@ const error = require('../../errors');
 router.route('/').post(
   validate,
   error.wrapper(async (req, res) => {
-    const user = await loginService.signIn(req.body);
-    res.json(user);
+    const token = await loginService.signIn(req.body);
+    res.json({ token });
   })
 );
 

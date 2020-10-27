@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const { NOT_FOUND, BAD_REQUEST, FORBIDDEN } = StatusCodes;
+const { NOT_FOUND, BAD_REQUEST, FORBIDDEN, UNAUTHORIZED } = StatusCodes;
 
 class NotFound extends Error {
   constructor(message) {
@@ -25,4 +25,12 @@ class Forbidden extends Error {
   }
 }
 
-module.exports = { NotFound, BadRequest, Forbidden };
+class Unauthorized extends Error {
+  constructor(message) {
+    super(message);
+
+    this.statusCode = UNAUTHORIZED;
+  }
+}
+
+module.exports = { NotFound, BadRequest, Forbidden, Unauthorized };
