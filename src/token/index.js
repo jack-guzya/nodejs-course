@@ -4,11 +4,15 @@ const { rest } = require('../errors');
 
 const get = payload => jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: '4h' });
 
-const getFromBearerScheme = string => string.replace(/^Bearer\s*/g, '');
+const parseBearerScheme = string => {
+  const [type, token] = string.split(/\s+/);
+
+  return type === 'Bearer' ? token : null;
+};
 
 const check = async (req, res, next) => {
   try {
-    const token = getFromBearerScheme(req.headers.authorization);
+    const token = parseBearerScheme(req.headers.authorization);
     await jwt.verify(token, JWT_SECRET_KEY);
 
     return next();
