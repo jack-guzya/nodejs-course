@@ -1,5 +1,6 @@
 const User = require('./user.model');
 const { rest } = require('../../errors');
+const crypt = require('../../crypt');
 
 const checkUserExists = (user, id) => {
   if (!user) {
@@ -16,10 +17,20 @@ const get = async id => {
   return user;
 };
 
-const create = async params => User.create(params);
+const getByFilter = async filter => User.find(filter);
+
+const create = async params => {
+  const hash = await crypt.getHash(params.password);
+
+  return User.create({ ...params, password: hash });
+};
 
 const update = async (id, params) => {
-  const user = await User.findOneAndUpdate({ _id: id }, params);
+  const hash = await crypt.getHash(params.password);
+  const user = await User.findOneAndUpdate(
+    { _id: id },
+    { ...params, password: hash }
+  );
   checkUserExists(user, id);
 
   return user;
@@ -32,4 +43,11 @@ const deleteUser = async id => {
   return user;
 };
 
-module.exports = { getAll, get, create, update, delete: deleteUser };
+module.exports = {
+  getAll,
+  get,
+  getByFilter,
+  create,
+  update,
+  delete: deleteUser
+};

@@ -6,6 +6,8 @@ const getAll = async () => usersRepo.getAll();
 
 const get = async id => usersRepo.get(id);
 
+const getByFilter = filter => usersRepo.getByFilter(filter);
+
 const create = async data => usersRepo.create(data);
 
 const update = async (id, data) => usersRepo.update(id, data);
@@ -17,4 +19,11 @@ const deleteUser = async id => {
   return User.toResponse(user);
 };
 
-module.exports = { getAll, get, create, update, delete: deleteUser };
+module.exports = {
+  getAll,
+  get,
+  getByFilter,
+  create,
+  update,
+  delete: deleteUser
+};
