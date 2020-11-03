@@ -26,7 +26,11 @@ const create = async params => {
 };
 
 const update = async (id, params) => {
-  const user = await User.findOneAndUpdate({ _id: id }, params);
+  const hash = await crypt.getHash(params.password);
+  const user = await User.findOneAndUpdate(
+    { _id: id },
+    { ...params, password: hash }
+  );
   checkUserExists(user, id);
 
   return user;
